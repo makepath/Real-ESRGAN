@@ -45,8 +45,8 @@ class RealESRGAN:
             config_file_url = hf_hub_url(repo_id=config['repo_id'], filename=config['filename'])
             cached_download(config_file_url, cache_dir=cache_dir, force_filename=local_filename)
             print('Weights downloaded to:', os.path.join(cache_dir, local_filename))
-        
-        loadnet = torch.load(model_path)
+
+        loadnet = torch.load(model_path, weights_only=True)
         if 'params' in loadnet:
             self.model.load_state_dict(loadnet['params'], strict=True)
         elif 'params_ema' in loadnet:
@@ -55,7 +55,7 @@ class RealESRGAN:
             self.model.load_state_dict(loadnet, strict=True)
         self.model.eval()
         self.model.to(self.device)
-        
+
     @torch.cuda.amp.autocast()
     def predict(self, lr_image, batch_size=4, patches_size=192,
                 padding=24, pad_size=15):
